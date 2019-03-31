@@ -101,7 +101,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
 
     # On end-of-file, don't forget to yield the last tree.
     if forms:
-        yield Tree(forms, lemmas, cpostags, postagas, feats, heads, deprels)
+        yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels)
 
 def write_tree_conll(file, tree):
     """
