@@ -53,7 +53,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
                         forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id)
                         yield tree
                     except:
-                        print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
+                        #print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
                         continue # just skip bad tree
 
                     node = 1
@@ -125,7 +125,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
         try:
             yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id)
         except:
-            print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
+            #print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
             pass # skip bad tree
 
 def write_tree_conll(file, tree):
