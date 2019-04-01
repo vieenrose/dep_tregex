@@ -1,4 +1,5 @@
 from dep_tregex.tree import Tree
+import re
 
 def _valid(text, empty_allowed=False):
     """
@@ -31,8 +32,8 @@ def read_trees_conll(filename_or_file, errors='strict'):
     """
 
     node = 1
-    forms, lemmas, cpostags, postags, feats, heads, deprels = \
-        [], [], [], [], [], [], []
+    forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id = \
+        [], [], [], [], [], [], [], ''
 
     # Determine whether we have a filename or a file object.
     # If we have a filename, get a file object.
@@ -48,19 +49,25 @@ def read_trees_conll(filename_or_file, errors='strict'):
             if not line:
                 if forms:
                     tree = Tree(
-                        forms, lemmas, cpostags, postags, feats, heads, deprels)
+                        forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id)
                     yield tree
 
                     node = 1
-                    forms, lemmas, cpostags, postags, feats, heads, deprels = \
-                        [], [], [], [], [], [], []
+                    forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id = \
+                        [], [], [], [], [], [], [], ''
                 continue
 
             # Split the line and check the format.
             parts = line.split(u'\t')
             if len(parts) != 10:
-                msg = 'expected 10 tab-separated fields, got %i'
+                try:
+                    sent_id = re.match(u'.*sent_id\s*=\s*([^\n]*)', line).group(1)
+                except:
+                    pass
+
                 continue # debug: just skip invalid line
+
+                #msg = 'expected 10 tab-separated fields, got %i'
                 #raise ValueError(msg % len(parts))
             """
             if parts[0] != unicode(node):
@@ -115,7 +122,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
 
     # On end-of-file, don't forget to yield the last tree.
     if forms:
-        yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels)
+        yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id)
 
 def write_tree_conll(file, tree):
     """
