@@ -424,8 +424,7 @@ if __name__ == '__main__':
         if limit:
             p.add_argument('--limit', help='draw only first N trees', type=int,
                            metavar='N', default=10)
-        p.add_argument('--lemma', help='include LEMMA field',
-                       action='store_true')
+        p.add_argument('--lemma', help='include LEMMA field',                       action='store_true')
         p.add_argument('--cpostag', help='include CPOSTAG field',
                        action='store_true')
         p.add_argument('--postag', help='include POSTAG field',
@@ -436,6 +435,7 @@ if __name__ == '__main__':
                        action='store_true')
         p.add_argument('--reuse-tab', help='reuse already opened browser tabs',
                         action='store_true')
+        p.add_argument('--misc', help='include MISC field',                       action='store_true')
 
     def _fields_from_args(args):
         fields = []
@@ -447,6 +447,8 @@ if __name__ == '__main__':
             fields.append('postag')
         if args.feats:
             fields.append('feats')
+        if args.misc:
+            fields.append('misc')
         return fields
 
     # Words

@@ -32,8 +32,8 @@ def read_trees_conll(filename_or_file, errors='strict'):
     """
 
     node = 1
-    forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id = \
-        [], [], [], [], [], [], [], ''
+    forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id = \
+        [], [], [], [], [], [], [], [], ''
 
     # Determine whether we have a filename or a file object.
     # If we have a filename, get a file object.
@@ -48,13 +48,17 @@ def read_trees_conll(filename_or_file, errors='strict'):
             # On empty line, yield the tree (if the tree is not empty).
             if not line:
                 if forms:
-                    tree = Tree(
-                        forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id)
-                    yield tree
+                    try:
+                        tree = Tree(
+                        forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id)
+                        yield tree
+                    except:
+                        print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
+                        continue # just skip bad tree
 
                     node = 1
-                    forms, lemmas, cpostags, postags, feats, heads, deprels = \
-                        [], [], [], [], [], [], []
+                    forms, lemmas, cpostags, postags, feats, heads, deprels, miscs = \
+                        [], [], [], [], [], [], [], []
                 continue
 
             # Split the line and check the format.
@@ -66,14 +70,6 @@ def read_trees_conll(filename_or_file, errors='strict'):
                     pass
 
                 continue
-
-                #msg = 'expected 10 tab-separated fields, got %i'
-                #raise ValueError(msg % len(parts))
-            """
-            if parts[0] != unicode(node):
-                msg = 'field 0: expected %r, got %r'
-                raise ValueError(msg % (str(node), parts[0]))
-            """
 
 	    """
             for i, part in enumerate(parts):
@@ -103,6 +99,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
                 lemma = u''
             if parts[5] == u'_':
                 feat = []
+            misc = parts[9]
 
 
             # Append the fields to the current tree.
@@ -113,16 +110,23 @@ def read_trees_conll(filename_or_file, errors='strict'):
             feats.append(feat)
             heads.append(head)
             deprels.append(deprel)
+            miscs.append(misc)
 
         # Catch all exceptions occurred while parsing, and report filename
         # and line number.
         except ValueError, e:
             msg = 'error while reading CoNLL file %r, line %i: %s'
+	    ## skip connectedness / loopness issue
+            if u'dicsonnected' in e: continue
             raise ValueError(msg % (filename_or_file, line_no, e))
 
     # On end-of-file, don't forget to yield the last tree.
     if forms:
-        yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id)
+        try:
+            yield Tree(forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id)
+        except:
+            print('error: try to yield a bad conncted tree ({}) !'.format(sent_id))
+            pass # skip bad tree
 
 def write_tree_conll(file, tree):
     """
@@ -143,6 +147,7 @@ def write_tree_conll(file, tree):
         feats = tree.feats(node)
         head = tree.heads(node)
         deprel = tree.deprels(node)
+        misc = tree.miscs(node)
 
         if not _valid(form, empty_allowed=False):
             raise ValueError(u'invalid FORM: %r' % form)
@@ -162,7 +167,7 @@ def write_tree_conll(file, tree):
         head = unicode(head)
         feats = u'|'.join(feats) or u'_'
 
-        parts = [id, form, lemma, cpostag, postag, feats, head, deprel]
-        file.write(u'\t'.join(parts) + u'\t_\t_\n')
+        parts = [id, form, lemma, cpostag, postag, feats, head, deprel, misc]
+        file.write(u'\t'.join(parts[:-1]) + u'\t_\t' + parts[-1]  + u'\n')
 
     file.write(u'\n')

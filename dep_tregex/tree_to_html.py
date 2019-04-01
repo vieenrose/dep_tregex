@@ -146,8 +146,7 @@ def _label(tree, node, fields):
     label = tree.forms(node)
 
     # Lemma.
-    if 'lemma' in fields:
-        label += u'\n' + tree.lemmas(node)
+    if 'lemma' in fields:        label += u'\n' + tree.lemmas(node)
 
     # Postags.
     postags = []
@@ -161,6 +160,9 @@ def _label(tree, node, fields):
     # Features.
     if 'feats' in fields:
         label += u'\n' + u'|'.join(tree.feats(node))
+
+    # Miscs
+    if 'misc' in fields:        label += u'\n' + tree.miscs(node)
 
     return cgi.escape(label)
 

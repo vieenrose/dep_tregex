@@ -9,7 +9,7 @@ def _check_is_not_a_str_list(l, name):
 class Tree:
     # - Constructor - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def __init__(self, forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id):
+    def __init__(self, forms, lemmas, cpostags, postags, feats, heads, deprels, miscs, sent_id):
         """
         Construct a tree.
 
@@ -30,6 +30,7 @@ class Tree:
         self._feats = list(feats)
         self._heads = list(heads)
         self._deprels = list(deprels)
+        self._miscs = list(miscs)
         self._sent_id = sent_id
 
         # Check lengths.
@@ -61,6 +62,7 @@ class Tree:
         _check_is_not_a_str_list(self._feats, 'Tree.feats')
         _check_is_not_a_str_list(self._heads, 'Tree.heads')
         _check_is_not_a_str_list(self._deprels, 'Tree.deprels')
+        _check_is_not_a_str_list(self._miscs, 'Tree.miscs')
 
         # Compose children index.
         self._children = [[] for node in range(N + 1)]
@@ -110,6 +112,11 @@ class Tree:
         if i <= 0:
             raise IndexError()
         return self._lemmas[i - 1]
+
+    def miscs(self, i):
+        if i <= 0:
+            raise IndexError()
+        return self._miscs[i - 1]
 
     def cpostags(self, i):
         """
@@ -190,7 +197,8 @@ class Tree:
             self._postags + list(postags),
             self._feats + list(feats),
             self._heads + list(heads),
-            self._deprels + list(deprels)
+            self._deprels + list(deprels),
+            self._miscs + list(miscs)
             )
 
     def reorder(self, new_index_by_old_index):
@@ -218,6 +226,7 @@ class Tree:
         feats = [None] * N
         heads = [None] * N
         deprels = [None] * N
+        miscs = [None] * N
 
         for old_index, new_index in enumerate(new_indices):
             old_head = self._heads[old_index]
@@ -233,9 +242,10 @@ class Tree:
             feats[new_index] = self._feats[old_index]
             heads[new_index] = new_head
             deprels[new_index] = self._deprels[old_index]
+            miscs[new_index] = self._miscs[old_index]
 
         # Update.
-        self.__init__(forms, lemmas, cpostags, postags, feats, heads, deprels)
+        self.__init__(forms, lemmas, cpostags, postags, feats, heads, miscs, deprels)
 
     def delete(self, nodes):
         """
@@ -278,6 +288,7 @@ class Tree:
         feats = []
         heads = []
         deprels = []
+        miscs = []
 
         for node in range(1, N + 1):
             if node in deleted:
@@ -289,9 +300,10 @@ class Tree:
             feats.append(self.feats(node))
             heads.append(new_nodes[alive_heads[node - 1]])
             deprels.append(self.deprels(node))
+            miscs.append(self.miscs(node))
 
         # Construct new tree.
-        self.__init__(forms, lemmas, cpostags, postags, feats, heads, deprels)
+        self.__init__(forms, lemmas, cpostags, postags, feats, heads, miscs, deprels)
 
     def set_head(self, node, head):
         """
@@ -317,7 +329,8 @@ class Tree:
             self._postags,
             self._feats,
             heads,
-            self._deprels
+            self._deprels,
+            self._miscs
             )
 
     def append_copy(self, nodes):
@@ -348,6 +361,7 @@ class Tree:
         feats = []
         heads = []
         deprels = []
+        miscs = []
 
         for node in copied:
             head = self.heads(node)
@@ -361,9 +375,10 @@ class Tree:
             feats.append(self.feats(node))
             heads.append(head)
             deprels.append(self.deprels(node))
+            miscs.append(self.miscs(node))
 
         # Append.`
-        self.append(forms, lemmas, cpostags, postags, feats, heads, deprels)
+        self.append(forms, lemmas, cpostags, postags, feats, heads, deprels, miscs)
 
     BEFORE = '-'
     AFTER = '+'
