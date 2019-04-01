@@ -6,8 +6,9 @@
 ## identify the focalized part of cleft constructions in Naija using tregex
 ## tregex's documentation: https://yandex.github.io/dep_tregex/index.html
 
-## todo:
-## add sentence ID in output
+## by default, for each type of cleft, the matched sentences are exported
+## in a indiviual files in CoNLL-U format (tables).
+## Ps. add --html in the second argument switch to HTML output in graphs.
 
 ## notaitons
 # "A .<-- B" : A has a child (B) to the left
