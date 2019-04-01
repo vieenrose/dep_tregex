@@ -19,16 +19,43 @@ RELATIVE='w form /wey/ and cpostag /SCONJ/ and deprel /dep/'
 DISLOCATED='d deprel /dislocated/'
 
 # covert cleft: na PIDGIN we don grow wit
-c_cleft="$FOCALIZED and .--> ($COPULA and -->. $REST)"
+c="$FOCALIZED and .--> ($COPULA and -->. $REST)"
 # overt cleft: na PIDGIN wey we don grow wit
-o_cleft="$FOCALIZED and -->. $RELATIVE"
+o="$FOCALIZED and -->. $RELATIVE"
 # double cleft: na PIDGIN na im we don grow wit
-d_cleft="$FOCALIZED and .--> ($COPULA and -->. ($COPULA2 and -->. $FOCALIZED2))"
+d="$FOCALIZED and .--> ($COPULA and -->. ($COPULA2 and -->. $FOCALIZED2))"
 # pseudo-cleft: wetin we don grow wit na Pidgin
-p_cleft="$FOCALIZED and .--> ($COPULA and .<-- $DISLOCATED and form /wetin/)"
+p="$FOCALIZED and .--> ($COPULA and .<-- $DISLOCATED and form /wetin/)"
 # revserse pseudo-cleft: Pidgin na wetin we don grow wit
-r_cleft="$FOCALIZED and form /wetin/ and .--> ($COPULA and .<-- $DISLOCATED)"
+r="$FOCALIZED and form /wetin/ and .--> ($COPULA and .<-- $DISLOCATED)"
 
-pattern=$o_cleft
 file=$1
-python -m 'dep_tregex' grep "$pattern" < $file --cpostag $2
+args=$2
+
+fileout=${file##*/}
+fileout=${fileout%.*}
+
+## echo $fileout
+
+pats[1]="$c"
+pats[2]="$o"
+pats[3]="$d"
+pats[4]="$p"
+pats[5]="$r"
+
+strs[1]='covert'
+strs[2]='overt'
+strs[3]='double'
+strs[4]='pseudo'
+strs[5]='reverse'
+
+for i in 1 2 3 4 5
+do
+    echo "${strs[$i]}"
+    if [[ $args == *"--html"* ]]; then
+    ext='.html'
+    else
+    ext='.conll10'
+    fi
+    python -m 'dep_tregex' grep "${pats[$i]}" < "$file" --cpostag --limit 10000 --print $args > "$fileout"_"${strs[$i]}""$ext"
+done
