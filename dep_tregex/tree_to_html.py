@@ -468,7 +468,12 @@ def write_tree_html(file, tree, fields=[], highlight_nodes=[], static=False):
 
         # Draw arc.
         if head == 0:
-            _draw_root_arc(file, center, baseline, height, deprel, arc_cls)
+            sid = tree._sent_id
+            root_label = u''
+            if sid.strip():
+                root_label += u"{}: ".format(sid)
+            root_label += deprel
+            _draw_root_arc(file, center, baseline, height, root_label, arc_cls)
         else:
             head_center = centers[head - 1]
             head_center += _parent_arc_start_offset(tree, node)
@@ -478,8 +483,11 @@ def write_tree_html(file, tree, fields=[], highlight_nodes=[], static=False):
         queue += tree.children(node)
         i += 1
 
+    # todo: put metadatas here
+
     # Done.
     file.write(u'    </svg>\n')
+
 
 def write_epilogue_html(file):
     file.write(_EPILOGUE_HTML)

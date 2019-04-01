@@ -53,8 +53,8 @@ def read_trees_conll(filename_or_file, errors='strict'):
                     yield tree
 
                     node = 1
-                    forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id = \
-                        [], [], [], [], [], [], [], ''
+                    forms, lemmas, cpostags, postags, feats, heads, deprels = \
+                        [], [], [], [], [], [], []
                 continue
 
             # Split the line and check the format.
@@ -65,7 +65,7 @@ def read_trees_conll(filename_or_file, errors='strict'):
                 except:
                     pass
 
-                continue # debug: just skip invalid line
+                continue
 
                 #msg = 'expected 10 tab-separated fields, got %i'
                 #raise ValueError(msg % len(parts))
@@ -131,7 +131,9 @@ def write_tree_conll(file, tree):
     file: file-like object.
     tree: a Tree.
     """
-
+    sent_id = tree._sent_id
+    if sent_id:
+        file.write(u'# sent_id = {}\n'.format(sent_id))
     for i in range(len(tree)):
         node = i + 1
         form = tree.forms(node)

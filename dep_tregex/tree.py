@@ -9,7 +9,7 @@ def _check_is_not_a_str_list(l, name):
 class Tree:
     # - Constructor - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def __init__(self, forms, lemmas, cpostags, postags, feats, heads, deprels):
+    def __init__(self, forms, lemmas, cpostags, postags, feats, heads, deprels, sent_id):
         """
         Construct a tree.
 
@@ -30,6 +30,7 @@ class Tree:
         self._feats = list(feats)
         self._heads = list(heads)
         self._deprels = list(deprels)
+        self._sent_id = sent_id
 
         # Check lengths.
         N = len(self._forms)
