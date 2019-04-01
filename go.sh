@@ -1,4 +1,4 @@
-set -vx
+#set -vx
 
 ## identify the focalized part of cleft constructions in Naija
 ## using tregex
@@ -19,16 +19,16 @@ RELATIVE='w form /wey/ and cpostag /SCONJ/ and deprel /dep/'
 DISLOCATED='d deprel /dislocated/'
 
 # covert cleft: na PIDGIN we don grow wit
-covert_cleft="$FOCALIZED and .--> ($COPULA and -->. $REST)"
+c_cleft="$FOCALIZED and .--> ($COPULA and -->. $REST)"
 # overt cleft: na PIDGIN wey we don grow wit
-overt_cleft="$FOCALIZED and -->. $RELATIVE"
+o_cleft="$FOCALIZED and -->. $RELATIVE"
 # double cleft: na PIDGIN na im we don grow wit
-double_cleft="$FOCALIZED and .--> ($COPULA and -->. ($COPULA2 and -->. $FOCALIZED2))"
+d_cleft="$FOCALIZED and .--> ($COPULA and -->. ($COPULA2 and -->. $FOCALIZED2))"
 # pseudo-cleft: wetin we don grow wit na Pidgin
-pseudo_cleft="$FOCALIZED and .--> ($COPULA and .<-- $DISLOCATED and form /wetin/)"
+p_cleft="$FOCALIZED and .--> ($COPULA and .<-- $DISLOCATED and form /wetin/)"
 # revserse pseudo-cleft: Pidgin na wetin we don grow wit
-reverse_pseudo_cleft="$FOCALIZED and form /wetin/ and .--> ($COPULA and .<-- $DISLOCATED)"
+r_cleft="$FOCALIZED and form /wetin/ and .--> ($COPULA and .<-- $DISLOCATED)"
 
-pattern=$double_cleft
-file='test2'
-python -m 'dep_tregex' grep "$pattern" < $file --html --cpostag
+pattern=$o_cleft
+file=$1
+python -m 'dep_tregex' grep "$pattern" < $file --cpostag $2
