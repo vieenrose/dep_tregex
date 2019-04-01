@@ -161,8 +161,12 @@ def _label(tree, node, fields):
     if 'feats' in fields:
         label += u'\n' + u'|'.join(tree.feats(node))
 
-    # Miscs
+    # Miscs & durations
     if 'misc' in fields:        label += u'\n' + tree.miscs(node)
+    if 'duration' in fields:
+        duration = tree.durations(node)
+	label += u'\n'
+        if duration : label += str(duration)
 
     return cgi.escape(label)
 

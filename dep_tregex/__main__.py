@@ -436,6 +436,7 @@ if __name__ == '__main__':
         p.add_argument('--reuse-tab', help='reuse already opened browser tabs',
                         action='store_true')
         p.add_argument('--misc', help='include MISC field',                       action='store_true')
+        p.add_argument('--duration', help='include duration field',                       action='store_true')
 
     def _fields_from_args(args):
         fields = []
@@ -447,8 +448,8 @@ if __name__ == '__main__':
             fields.append('postag')
         if args.feats:
             fields.append('feats')
-        if args.misc:
-            fields.append('misc')
+        if args.misc: fields.append('misc')
+        if args.duration: fields.append('duration')
         return fields
 
     # Words

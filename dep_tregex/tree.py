@@ -118,6 +118,15 @@ class Tree:
             raise IndexError()
         return self._miscs[i - 1]
 
+    def durations(self, i):
+        txt = self.miscs(i)
+        arr = txt.split('|')
+        if len(arr) == 2:
+            tmin,tmax = int(arr[0]),int(arr[-1])
+            if tmin <= tmax:
+                 return tmax - tmin
+        return None
+
     def cpostags(self, i):
         """
         Return CPOSTAG for i'th word.
