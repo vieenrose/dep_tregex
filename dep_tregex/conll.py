@@ -7,7 +7,8 @@ def _valid(text, empty_allowed=False):
     """
 
     # Whitespace is not allowed inside strings.
-    for c in u'\t\n ':
+    #for c in u'\t\n ':
+    for c in u'\t\n':
         if c in text:
             return False
 
@@ -59,30 +60,43 @@ def read_trees_conll(filename_or_file, errors='strict'):
             parts = line.split(u'\t')
             if len(parts) != 10:
                 msg = 'expected 10 tab-separated fields, got %i'
-                raise ValueError(msg % len(parts))
+                continue # debug: just skip invalid line
+                #raise ValueError(msg % len(parts))
+            """
             if parts[0] != unicode(node):
                 msg = 'field 0: expected %r, got %r'
                 raise ValueError(msg % (str(node), parts[0]))
+            """
+
+	    """
             for i, part in enumerate(parts):
                 if part:
                     continue
                 msg = 'field %i: empty'
                 raise ValueError(msg % i)
-
+            """
             # Parse the fields.
             node += 1
+            if not parts[1]:
+                parts[1] = u'_'
             form = parts[1]
+            if not parts[2]:
+                parts[2] = form
             lemma = parts[2]
             cpostag = parts[3]
             postag = parts[4]
             feat = parts[5].split(u'|')
-            head = int(parts[6])
+            if parts[6] == u'_':
+                head = 0
+            else:
+                head = int(parts[6])
             deprel = parts[7]
 
             if parts[2] == u'_':
                 lemma = u''
             if parts[5] == u'_':
                 feat = []
+
 
             # Append the fields to the current tree.
             forms.append(form)
