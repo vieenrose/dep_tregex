@@ -175,13 +175,19 @@ data = np.array([[statistics[x][y] for y in v2] for x in v1])
 # reorder the matrix according by row's norm
 data,v1,v2= reorder_matrix(data, v1, v2)
 # troncate data to fit vis_data_size
-if vis_data_size > 0: 
+max_cnt_deleted = 0
+if vis_data_size > 0:
 	while data.shape[0] * data.shape[1] > vis_data_size :
 	        if data.shape[0] > data.shape[1]:
                     data = np.delete(data, -1, 0)
+		    M = data[:,-1].max()
                 else:
                     data = np.delete(data, -1, 1)
+		    M = data[-1,:].max()
+		if M > max_cnt_deleted: max_cnt_deleted = M
                 data,v1,v2= reorder_matrix(data, v1, v2)
+#debug
+#print(max_cnt_deleted)
 
 mask = np.zeros_like(data)
 for i,row in enumerate(data):
@@ -192,7 +198,7 @@ for i,row in enumerate(data):
 plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
 fig, ax = plt.subplots()
 titl = '\'{}\' in Naija ({} over {} sentences, {} relations'.format(deprel,cnt_sent,cnt_sent_tot,cnt_bigram)
-if thld: titl += ', cnt > {})'.format(thld)
+if max_cnt_deleted: titl += ', cnt > {})'.format(max_cnt_deleted)
 else:    titl += ')'
 plt.title(titl)
 #fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
