@@ -33,6 +33,8 @@ class sentence:
 				return tok
 		return None
 
+cnt_sent = 0
+cnt_svc = 0
 with codecs.open(file, encoding='utf-8') as text :
         out = codecs.open(fileout,'w',encoding='utf-8')
 	sent = sentence()
@@ -58,11 +60,16 @@ with codecs.open(file, encoding='utf-8') as text :
 		# reach the end of a sentence
 		if line == '\n':
                         if sent.svcs:
+				# count a sentence containing svc(s)
+				cnt_sent += 1
+
 				# export SVC arguments
 				if sent.id: sent_id = sent.id
 				else: sent_id = 'Unknown'
 				out.write('# sent_id = {}\n'.format(sent_id))
 				for svc in sent.svcs:
+					# count a svc
+					cnt_svc+=1
 					svc_lst = sorted(list(svc))
 					for j in svc_lst:
 						token = sent.token(j)
@@ -92,6 +99,10 @@ for x in sorted(statistics.keys()):
 		if i<len(statistics[x])-1: out2.write(', ')
 	out2.write('\n')
 
+# counts
+print('cnt_sent',cnt_sent)
+print('cnt_svc',cnt_svc)
+
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>1])
 v2=[]
 for x in v1:v2 += statistics[x].keys();
@@ -99,12 +110,10 @@ v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>1])
 
 data = []
 for x in v1: data.append([np.log10(max((int(statistics[x][y])),1)) for y in v2])
-print(data)
 data = np.array(data)
 mask = np.zeros_like(data)
 datamax=(max([max(line)for line in data]))
 datamin=(min([min(line)for line in data]))
-print(len(data))
 with sns.axes_style("white"):
 	fig, ax = plt.subplots()
 	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, linecolor='black')
