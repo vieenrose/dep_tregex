@@ -158,6 +158,15 @@ v2=sorted(list(set(v2)))
 
 # make data matrix
 data = np.array([[statistics[x][y] for y in v2] for x in v1])
+# reorder the matrix according by row's norm
+
+
+v1=np.array(v1); v2=np.array(v2)
+v1list = np.array(np.argsort(np.linalg.norm(data,axis=1)))[::-1]
+data=data[v1list]; v1=v1[v1list]
+v2list = np.array(np.argsort(np.linalg.norm(data,axis=0)))[::-1]
+data=(data.transpose()[v2list]).transpose(); v2=v2[v2list]
+
 mask = np.zeros_like(data)
 for i,row in enumerate(data):
       for j,val in enumerate(row):
