@@ -123,7 +123,7 @@ print('cnt_bigram',cnt_bigram)
 print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
-thld = 1
+thld = 0
 figwid = 13
 
 # figure filename
@@ -151,14 +151,15 @@ titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.forma
 if thld: titl += ', cnt > {})'.format(thld)
 else:    titl += ')'
 plt.title(titl)
-fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
+#fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
 ax = sns.heatmap(data, yticklabels=v1, xticklabels=v2, vmax=data.max(), vmin=data.min(), \
 cmap="Blues", cbar=False, \
-square=True, annot=False, fmt='d',\
+square=False, annot=False, fmt='d',\
 mask=mask, \
-linecolor='black', linewidth=0.1)
+linecolor='gray', linewidth=0.005)
 plt.ylabel('Head'); plt.xlabel('Dependant')
 fig.canvas.set_window_title('Serial verb construction relation in Naija')
+plt.tight_layout()
 fig.savefig(figout)   # save the figure to file
 plt.close(fig)    # close the figure
 
