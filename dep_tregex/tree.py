@@ -70,6 +70,7 @@ class Tree:
             self._children[head].append(node)
 
         # Check tree validity: connectivity and looplessness.
+	"""
         queue = [0]
         visited = set()
         i = 0
@@ -84,7 +85,6 @@ class Tree:
                     raise ValueError('loop in a tree; heads %r' % self._heads)
                 queue.append(child)
 
-	"""
         if len(queue) != len(self) + 1:
             raise ValueError('dicsonnected node, heads %r' % self._heads)
 	"""
