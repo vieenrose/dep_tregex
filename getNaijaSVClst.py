@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 
 deprel=args.deprel
-pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}[^\t]*\t.*\n'.format(deprel)
+pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
 file=args.file
 ext='.conll10'
 ext2='.txt'
@@ -174,7 +174,7 @@ cmap="Blues", cbar=False, \
 square=False, annot=True, fmt='d',\
 mask=mask, \
 linecolor='gray', linewidth=0.005)
-plt.ylabel('Head'); plt.xlabel('Dependant')
+plt.ylabel('Dependent'); plt.xlabel('Head')
 fig.canvas.set_window_title('Serial verb construction relation in Naija')
 plt.tight_layout()
 fig.savefig(figout)   # save the figure to file
