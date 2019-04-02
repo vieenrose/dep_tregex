@@ -44,6 +44,8 @@ class sentence:
 				return tok
 		return None
 
+cnt_sent_tot = 0
+cnt_bigram = 0
 cnt_sent = 0
 cnt_svc = 0
 cnt_svc_len = collections.Counter()
@@ -93,6 +95,8 @@ with codecs.open(file, encoding='utf-8') as text :
 						if xlem == '_': xlem = xform
 						if ylem == '_': ylem = yform
 						#print(xlem,ylem)
+						# bigram count
+						cnt_bigram += 1
 						if xlem not in statistics.keys():
 							statistics[xlem]=collections.Counter()
 						statistics[xlem][ylem]+=1
@@ -100,6 +104,7 @@ with codecs.open(file, encoding='utf-8') as text :
 				out.write('\n')
 
 			sent.reset()
+			cnt_sent_tot += 1
 
 # export the list
 out2 = codecs.open(fileout2,'w',encoding='utf-8')
@@ -115,11 +120,12 @@ for x in sorted(statistics.keys()):
 # show sentence and svc counts
 print('cnt_sent',cnt_sent)
 print('cnt_svc',cnt_svc)
-print('cnt°svc_len',cnt_svc_len)
+print('cnt_bigram',cnt_bigram)
+print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
-thld = 1
-figwid = 10
+thld = 0
+figwid = 15
 
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
 v2=[]
@@ -133,7 +139,6 @@ mask = np.zeros_like(data)
 datamax=(max([max(line)for line in data]))
 datamin=(min([min(line)for line in data]))
 with sns.axes_style("white"):
-	#print(len(v1),len(v2))
 	plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
 	fig, ax = plt.subplots()
 	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, square=True)
@@ -141,13 +146,18 @@ with sns.axes_style("white"):
 	ax.set_xticklabels(v2)
 	ax.set_yticklabels(v1)
 	# Rotate the tick labels and set their alignment.
-	plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+	plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="default")
 	plt.setp(ax.get_yticklabels(), rotation=0, ha="right", rotation_mode="default")
 	fig.canvas.set_window_title('Serial verb construction relation in Naija')
         plt.ylabel('Head')
         plt.xlabel('Dependant')
-	plt.title('\'compound:svc\' relation in Naija')
-	#fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
-#plt.show()
+	titl = '\'compound:svc\' in Naija ({} / {} sents, {} SVCs'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
+	if thld:
+		titl += ' cnt > {} )'.format(thld)
+	else:
+		titl += ')'
+
+	plt.title(titl)
+	fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
 fig.savefig(figout)   # save the figure to file
 plt.close(fig)    # close the figure
