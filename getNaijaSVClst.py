@@ -134,6 +134,10 @@ with sns.axes_style("white"):
 	# Rotate the tick labels and set their alignment.
 	plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 	plt.setp(ax.get_yticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-	fig.tight_layout()
+	fig.canvas.set_window_title('Serial verb construction relation in Naija')
+        plt.ylabel('Head')
+        plt.xlabel('Dependant')
+	plt.title(''compound:svc' relation in Naija')
+	fig.subplots_adjust(bottom=0.15)
 plt.show()
 
