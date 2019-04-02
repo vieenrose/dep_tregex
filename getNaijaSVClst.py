@@ -125,7 +125,7 @@ print('cnt_svc_len',cnt_svc_len)
 # show and save heatmap
 
 #thld = 1
-figwid = 15
+figwid = 20
 
 while True:
       try:
