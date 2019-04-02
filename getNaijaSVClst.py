@@ -1,11 +1,14 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python -*- coding: utf-8 -*-
 import codecs, re, os,collections,sys
+import matplotlib.pylab as plt
+import seaborn as sns
+import numpy as np
 
 file='all_naija.conll10'
 ext='.conll10'
+ext2='.txt'
 fileout=os.path.splitext(file)[0]+'_svc_list'+ext
-fileout2=os.path.splitext(file)[0]+'_svc_bigram'+ext
+fileout2=os.path.splitext(file)[0]+'_svc_bigram'+ext2
 print('{} -> {}'.format(file,fileout))
 print('{} -> {}'.format(file,fileout2))
 
@@ -88,3 +91,32 @@ for x in sorted(statistics.keys()):
 		if cnt > 1: out2.write('({})'.format(cnt))
 		if i<len(statistics[x])-1: out2.write(', ')
 	out2.write('\n')
+
+v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>1])
+v2=[]
+for x in v1:v2 += statistics[x].keys();
+v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>1])
+
+data = []
+for x in v1: data.append([np.log(max((int(statistics[x][y])),1)) for y in v2])
+print(data)
+data = np.array(data)
+mask = np.zeros_like(data)
+datamax=(max([max(line)for line in data]))
+datamin=(min([min(line)for line in data]))
+print(len(data))
+with sns.axes_style("white"):
+	fig, ax = plt.subplots()
+	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="Greens", cbar=False)
+	# We want to show all ticks...
+	ax.set_xticks(np.arange(len(v2)))
+	ax.set_yticks(np.arange(len(v1)))
+	# ... and label them with the respective list entries
+	ax.set_xticklabels(v2)
+	ax.set_yticklabels(v1)
+	# Rotate the tick labels and set their alignment.
+	plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+	plt.setp(ax.get_yticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+	fig.tight_layout()
+plt.show()
+
