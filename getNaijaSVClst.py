@@ -86,7 +86,7 @@ with codecs.open(file, encoding='utf-8') as text :
 				# export relation's arguments
 				if sent.id: sent_id = sent.id
 				else: sent_id = 'Unknown'
-				out.write('# sent_id = {}\n'.format(sent_id))
+				out.write(u'# sent_id = {}\n'.format(sent_id))
 				for rel in sent.rels:
 					# count a rel
 					cnt_rel+=1;cnt_rel_len[len(rel)] += 1
@@ -94,7 +94,7 @@ with codecs.open(file, encoding='utf-8') as text :
 					for j in rel_lst:
 						token = sent.token(j)
 						if token:
-   	              					out.write(token+'\n')
+   	              					out.write(token+u'\n')
 					# bi-grams
 					if len(rel_lst):
 						for i in range(len(rel_lst)-1):
@@ -112,7 +112,7 @@ with codecs.open(file, encoding='utf-8') as text :
 							except:
 								continue
 
-				out.write('\n')
+				out.write(u'\n')
 
 			sent.reset()
 			cnt_sent_tot += 1
@@ -120,13 +120,17 @@ with codecs.open(file, encoding='utf-8') as text :
 # export the list
 out2 = codecs.open(fileout2,'w',encoding='utf-8')
 for x in sorted(statistics.keys()):
-	out2.write('{:s}: '.format(x))
+	out2.write(u'{:s}: '.format(x))
 	for i,y in enumerate(statistics[x].most_common()):
 		lem,cnt=y
-		out2.write('{}'.format(lem.strip()))
-		if cnt > 1: out2.write('({})'.format(cnt))
-		if i<len(statistics[x])-1: out2.write(', ')
-	out2.write('\n')
+		try:
+    		    out2.write(u'{}'.format(lem.strip()))
+		except:
+		    print(lem)
+		    raise
+		if cnt > 1: out2.write(u'({})'.format(cnt))
+		if i<len(statistics[x])-1: out2.write(u', ')
+	out2.write(u'\n')
 
 # show sentence and rel counts
 print('cnt_sent',cnt_sent)
