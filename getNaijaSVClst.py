@@ -9,10 +9,13 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--file", "-f", type=str, required=True)
-parser.add_argument("--thld", "-t", type=int, required=False)
+parser.add_argument("--size", "-s", type=int, required=False)
 parser.add_argument("--deprel", "-d", type=str, required=True)
 args = parser.parse_args()
-
+if args.size:
+      vis_data_size = args.size
+else:
+      vis_data_size = -1 # non restriction
 
 deprel=args.deprel
 pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
@@ -25,6 +28,16 @@ fileout2=os.path.splitext(file)[0]+u'_{}_bigram'.format(deprel)+ext2
 print('{} -> {}'.format(file,fileout))
 print('{} -> {}'.format(file,fileout2))
 #print('{} -> {}'.format(file,figout))
+
+def reorder_matrix(data, v1, v2):
+      v1=np.array(v1)
+      v2=np.array(v2)
+      v1list = np.array(np.argsort(np.linalg.norm(data,axis=1)))[::-1]
+      data=data[v1list]; v1=v1[v1list]
+      v2list = np.array(np.argsort(np.linalg.norm(data,axis=0)))[::-1]
+      data=(data.transpose()[v2list]).transpose(); v2=v2[v2list]
+      return data,v1,v2
+
 
 class sentence:
 	def __init__(self):
@@ -141,14 +154,15 @@ print('cnt_bigram',cnt_bigram)
 print('cnt_rel_len',cnt_rel_len)
 
 # show and save heatmap
-if args.thld > 0: thld = args.thld
-else: thld = 0
+if args.size > 0: data_vis_size = args.size
+else: data_vis_size = 10*10
 figwid = 13
 
 # figure filename
-figout = os.path.splitext(file)[0] + '_{}_bigram_heatmap_thld_{}'.format(deprel,thld) + ext3
+figout = os.path.splitext(file)[0] + '_heatmap_{}'.format(deprel) + ext3
 
 # store words appearing as the head (and dependent) more than thld times
+thld = 0
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
 v2=[]
 for w in v1:
@@ -159,13 +173,15 @@ v2=sorted(list(set(v2)))
 # make data matrix
 data = np.array([[statistics[x][y] for y in v2] for x in v1])
 # reorder the matrix according by row's norm
-
-
-v1=np.array(v1); v2=np.array(v2)
-v1list = np.array(np.argsort(np.linalg.norm(data,axis=1)))[::-1]
-data=data[v1list]; v1=v1[v1list]
-v2list = np.array(np.argsort(np.linalg.norm(data,axis=0)))[::-1]
-data=(data.transpose()[v2list]).transpose(); v2=v2[v2list]
+data,v1,v2= reorder_matrix(data, v1, v2)
+# troncate data to fit vis_data_size
+if vis_data_size > 0: 
+	while data.shape[0] * data.shape[1] > vis_data_size :
+	        if data.shape[0] > data.shape[1]:
+                    data = np.delete(data, -1, 0)
+                else:
+                    data = np.delete(data, -1, 1)
+                data,v1,v2= reorder_matrix(data, v1, v2)
 
 mask = np.zeros_like(data)
 for i,row in enumerate(data):
