@@ -133,7 +133,13 @@ for x in v1:v2 += statistics[x].keys();
 v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>thld])
 
 data = []
-for x in v1: data.append([np.log10(max((int(statistics[x][y])),max(thld,1))) for y in v2])
+
+def relu_log(x, thld = 1):
+	x = float(x)
+	if x <= thld : return thld
+	else: return  thld + np.log10(x)
+
+for x in v1: data.append([relu_log(statistics[x][y]) for y in v2])
 data = np.array(data)
 mask = np.zeros_like(data)
 datamax=(max([max(line)for line in data]))
@@ -151,7 +157,7 @@ with sns.axes_style("white"):
 	fig.canvas.set_window_title('Serial verb construction relation in Naija')
         plt.ylabel('Head')
         plt.xlabel('Dependant')
-	titl = '\'compound:svc\' in Naija ({} / {} sents, {} SVCs'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
+	titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
 	if thld:
 		titl += ' cnt > {} )'.format(thld)
 	else:
