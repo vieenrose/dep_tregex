@@ -124,7 +124,7 @@ print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
 
-#thld = 1
+thld = 0
 figwid = 20
 
 while True:
@@ -155,7 +155,7 @@ while True:
                   ax.set_xticklabels(v2)
                   ax.set_yticklabels(v1)
                   # Rotate the tick labels and set their alignment.
-                  plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="default")
+                  plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
                   plt.setp(ax.get_yticklabels(), rotation=0, ha="right", rotation_mode="default")
                   fig.canvas.set_window_title('Serial verb construction relation in Naija')
                   plt.ylabel('Head')
@@ -170,5 +170,6 @@ while True:
                   fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
             fig.savefig(figout)   # save the figure to file
             plt.close(fig)    # close the figure
+            thld+=1
       except:
             break
