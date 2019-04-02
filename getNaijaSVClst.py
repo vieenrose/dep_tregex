@@ -18,10 +18,9 @@ ext2='.txt'
 ext3='.png'
 fileout=os.path.splitext(file)[0]+'_svc_list'+ext
 fileout2=os.path.splitext(file)[0]+'_svc_bigram'+ext2
-figout=os.path.splitext(file)[0]+'_svc_bigram_heatmap'+ext3
 print('{} -> {}'.format(file,fileout))
 print('{} -> {}'.format(file,fileout2))
-print('{} -> {}'.format(file,figout))
+#print('{} -> {}'.format(file,figout))
 
 class sentence:
 	def __init__(self):
@@ -124,46 +123,52 @@ print('cnt_bigram',cnt_bigram)
 print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
-thld = 1
+
+#thld = 1
 figwid = 15
 
-v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
-v2=[]
-for x in v1:v2 += statistics[x].keys();
-v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>thld])
+while True:
+      try:
+            figout=os.path.splitext(file)[0]+'_svc_bigram_heatmap_thld_{}'.format(thld)+ext3
+            v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
+            v2=[]
+            for x in v1:v2 += statistics[x].keys();
+            v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>thld])
 
-data = []
+            data = []
 
-def relu_log(x, thld = 1):
-	x = float(x)
-	if x <= thld : return thld
-	else: return  thld + np.log10(x)
+            def relu_log(x, thld = 1):
+                  x = float(x)
+                  if x <= thld : return thld
+                  else: return  thld + np.log10(x)
 
-for x in v1: data.append([relu_log(statistics[x][y]) for y in v2])
-data = np.array(data)
-mask = np.zeros_like(data)
-datamax=(max([max(line)for line in data]))
-datamin=(min([min(line)for line in data]))
-with sns.axes_style("white"):
-	plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
-	fig, ax = plt.subplots()
-	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, square=True)
-	# ... and label them with the respective list entries
-	ax.set_xticklabels(v2)
-	ax.set_yticklabels(v1)
-	# Rotate the tick labels and set their alignment.
-	plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="default")
-	plt.setp(ax.get_yticklabels(), rotation=0, ha="right", rotation_mode="default")
-	fig.canvas.set_window_title('Serial verb construction relation in Naija')
-        plt.ylabel('Head')
-        plt.xlabel('Dependant')
-	titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
-	if thld:
-		titl += ', cnt > {} )'.format(thld)
-	else:
-		titl += ')'
+            for x in v1: data.append([relu_log(statistics[x][y]) for y in v2])
+            data = np.array(data)
+            mask = np.zeros_like(data)
+            datamax=(max([max(line)for line in data]))
+            datamin=(min([min(line)for line in data]))
+            with sns.axes_style("white"):
+                  plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
+                  fig, ax = plt.subplots()
+                  ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, square=True)
+                  # ... and label them with the respective list entries
+                  ax.set_xticklabels(v2)
+                  ax.set_yticklabels(v1)
+                  # Rotate the tick labels and set their alignment.
+                  plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="default")
+                  plt.setp(ax.get_yticklabels(), rotation=0, ha="right", rotation_mode="default")
+                  fig.canvas.set_window_title('Serial verb construction relation in Naija')
+                  plt.ylabel('Head')
+                  plt.xlabel('Dependant')
+                  titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
+                  if thld:
+                        titl += ', cnt > {} )'.format(thld)
+                  else:
+                        titl += ')'
 
-	plt.title(titl)
-	fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
-fig.savefig(figout)   # save the figure to file
-plt.close(fig)    # close the figure
+                  plt.title(titl)
+                  fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
+            fig.savefig(figout)   # save the figure to file
+            plt.close(fig)    # close the figure
+      except:
+            break
