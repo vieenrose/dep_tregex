@@ -123,47 +123,42 @@ print('cnt_bigram',cnt_bigram)
 print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
-
-thld = 0
+thld = 1
 figwid = 13
 
-while True:
-      try:
-	    # figure filename
-            figout = os.path.splitext(file)[0] + '_svc_bigram_heatmap_thld_{}'.format(thld) + ext3
+# figure filename
+figout = os.path.splitext(file)[0] + '_svc_bigram_heatmap_thld_{}'.format(thld) + ext3
 
-	    # store words appearing as the head (and dependent) more than thld times
-            v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
-            v2=[]
-            for w in v1:
-		for w2 in statistics[w].keys():
-			if statistics[w][w2] > thld: v2.append(w2)
-            v2=sorted(list(set(v2)))
+# store words appearing as the head (and dependent) more than thld times
+v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
+v2=[]
+for w in v1:
+      for w2 in statistics[w].keys():
+          if statistics[w][w2] > thld: v2.append(w2)
+v2=sorted(list(set(v2)))
 
-	    # make data matrix
-            data = np.array([[statistics[x][y] for y in v2] for x in v1])
-	    mask = np.zeros_like(data)
-	    for i,row in enumerate(data):
-		for j,val in enumerate(row):
-			if not val:mask[i][j]=True
+# make data matrix
+data = np.array([[statistics[x][y] for y in v2] for x in v1])
+mask = np.zeros_like(data)
+for i,row in enumerate(data):
+      for j,val in enumerate(row):
+          if not val:mask[i][j]=True
 
-	    # config layout
-            plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
-            fig, ax = plt.subplots()
-            titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
-            if thld: titl += ', cnt > {})'.format(thld)
-            else:    titl += ')'
-            plt.title(titl)
-            fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
-            ax = sns.heatmap(data, yticklabels=v1, xticklabels=v2, vmax=data.max(), vmin=data.min(), \
-		cmap="Blues", cbar=False, \
-		square=True, annot=False, fmt='d',\
-		mask=mask, \
-		linecolor='black', linewidth=0.1)
-            plt.ylabel('Head'); plt.xlabel('Dependant')
-            fig.canvas.set_window_title('Serial verb construction relation in Naija')
-            fig.savefig(figout)   # save the figure to file
-            plt.close(fig)    # close the figure
-            thld+=1
-      except:
-            break
+# config layout
+plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
+fig, ax = plt.subplots()
+titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
+if thld: titl += ', cnt > {})'.format(thld)
+else:    titl += ')'
+plt.title(titl)
+fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
+ax = sns.heatmap(data, yticklabels=v1, xticklabels=v2, vmax=data.max(), vmin=data.min(), \
+cmap="Blues", cbar=False, \
+square=True, annot=False, fmt='d',\
+mask=mask, \
+linecolor='black', linewidth=0.1)
+plt.ylabel('Head'); plt.xlabel('Dependant')
+fig.canvas.set_window_title('Serial verb construction relation in Naija')
+fig.savefig(figout)   # save the figure to file
+plt.close(fig)    # close the figure
+
