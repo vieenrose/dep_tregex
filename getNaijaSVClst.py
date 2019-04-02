@@ -12,6 +12,8 @@ parser.add_argument("--file", "-f", type=str, required=True)
 args = parser.parse_args()
 
 
+deprel='compound:svc'
+pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
 file=args.file
 ext='.conll10'
 ext2='.txt'
@@ -61,7 +63,7 @@ with codecs.open(file, encoding='utf-8') as text :
 			continue
 		# match a svc dependent then save its ID pairs (ID, HEAD)
 		# eg. 15\tgo\t_\tVERB\t_\t_\t14\tcompound:svc\t_\t74350|74505
-		result = re.match(u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\tcompound:svc\t.*\n', line)
+		result = re.match(pattern, line)
 		if result:
 			tokenid, headid = int(result.group(1)),int(result.group(2))
 			sent.add_svc(tokenid, headid)
@@ -154,7 +156,7 @@ plt.title(titl)
 #fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
 ax = sns.heatmap(data, yticklabels=v1, xticklabels=v2, vmax=data.max(), vmin=data.min(), \
 cmap="Blues", cbar=False, \
-square=False, annot=False, fmt='d',\
+square=False, annot=True, fmt='d',\
 mask=mask, \
 linecolor='gray', linewidth=0.005)
 plt.ylabel('Head'); plt.xlabel('Dependant')
