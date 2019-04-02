@@ -9,17 +9,18 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--file", "-f", type=str, required=True)
+parser.add_argument("--thld", "-t", type=int, required=False)
 args = parser.parse_args()
 
 
-deprel='compound:svc'
+deprel=u'comp:pred'
 pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
 file=args.file
 ext='.conll10'
 ext2='.txt'
 ext3='.png'
-fileout=os.path.splitext(file)[0]+'_svc_list'+ext
-fileout2=os.path.splitext(file)[0]+'_svc_bigram'+ext2
+fileout=os.path.splitext(file)[0]+u'_{}_list'.format(deprel)+ext
+fileout2=os.path.splitext(file)[0]+u'_{}_bigram'.format(deprel)+ext2
 print('{} -> {}'.format(file,fileout))
 print('{} -> {}'.format(file,fileout2))
 #print('{} -> {}'.format(file,figout))
@@ -27,16 +28,16 @@ print('{} -> {}'.format(file,fileout2))
 class sentence:
 	def __init__(self):
 		self.reset()
-	def add_svc(self, tid, hid):
+	def add_rel(self, tid, hid):
 		inter = -1
-		new_svc = set((tid,hid))
-		for i,svc in enumerate(self.svcs):
-			if svc & new_svc: inter = i; break
-		if inter < 0: self.svcs.append(new_svc) # svc doublet
-		else: self.svcs[inter]=self.svcs[inter].union(new_svc) # svc n-tuple, n > 2
+		new_rel = set((tid,hid))
+		for i,rel in enumerate(self.rels):
+			if rel & new_rel: inter = i; break
+		if inter < 0: self.rels.append(new_rel) # rel doublet
+		else: self.rels[inter]=self.rels[inter].union(new_rel) # rel n-tuple, n > 2
 	def reset(self):
 		self.id = ''
-		self.svcs = []
+		self.rels = []
 		self.tokens = []
 	def token(self,i):
 		for tok in self.tokens:
@@ -48,8 +49,8 @@ class sentence:
 cnt_sent_tot = 0
 cnt_bigram = 0
 cnt_sent = 0
-cnt_svc = 0
-cnt_svc_len = collections.Counter()
+cnt_rel = 0
+cnt_rel_len = collections.Counter()
 with codecs.open(file, encoding='utf-8') as text :
         out = codecs.open(fileout,'w',encoding='utf-8')
 	sent = sentence()
@@ -61,12 +62,12 @@ with codecs.open(file, encoding='utf-8') as text :
 			sent_id = result.group(1)
 			sent.id = sent_id
 			continue
-		# match a svc dependent then save its ID pairs (ID, HEAD)
+		# match a rel dependent then save its ID pairs (ID, HEAD)
 		# eg. 15\tgo\t_\tVERB\t_\t_\t14\tcompound:svc\t_\t74350|74505
 		result = re.match(pattern, line)
 		if result:
 			tokenid, headid = int(result.group(1)),int(result.group(2))
-			sent.add_svc(tokenid, headid)
+			sent.add_rel(tokenid, headid)
 		# match a token and save it a raw string
 		if len(line.split('\t')) == 10:
 			line=line.replace('\n','')
@@ -74,25 +75,25 @@ with codecs.open(file, encoding='utf-8') as text :
 
 		# reach the end of a sentence
 		if line == '\n':
-                        if sent.svcs:
-				# count a sentence containing svc(s)
+                        if sent.rels:
+				# count a sentence containing rel(s)
 				cnt_sent += 1
 
-				# export SVC arguments
+				# export relation's arguments
 				if sent.id: sent_id = sent.id
 				else: sent_id = 'Unknown'
 				out.write('# sent_id = {}\n'.format(sent_id))
-				for svc in sent.svcs:
-					# count a svc
-					cnt_svc+=1;cnt_svc_len[len(svc)] += 1
-					svc_lst = sorted(list(svc))
-					for j in svc_lst:
+				for rel in sent.rels:
+					# count a rel
+					cnt_rel+=1;cnt_rel_len[len(rel)] += 1
+					rel_lst = sorted(list(rel))
+					for j in rel_lst:
 						token = sent.token(j)
 						out.write(token+'\n')
 					# bi-grams
-					for i in range(len(svc_lst)-1):
-						xform, xlem = sent.token(svc_lst[i]).split('\t')[1:3]
-						yform, ylem = sent.token(svc_lst[i+1]).split('\t')[1:3]
+					for i in range(len(rel_lst)-1):
+						xform, xlem = sent.token(rel_lst[i]).split('\t')[1:3]
+						yform, ylem = sent.token(rel_lst[i+1]).split('\t')[1:3]
 						if xlem == '_': xlem = xform
 						if ylem == '_': ylem = yform
 						#print(xlem,ylem)
@@ -118,18 +119,19 @@ for x in sorted(statistics.keys()):
 		if i<len(statistics[x])-1: out2.write(', ')
 	out2.write('\n')
 
-# show sentence and svc counts
+# show sentence and rel counts
 print('cnt_sent',cnt_sent)
-print('cnt_svc',cnt_svc)
+print('cnt_rel',cnt_rel)
 print('cnt_bigram',cnt_bigram)
-print('cnt_svc_len',cnt_svc_len)
+print('cnt_rel_len',cnt_rel_len)
 
 # show and save heatmap
-thld = 0
+if args.thld > 0: thld = args.thld
+else: thld = 0
 figwid = 13
 
 # figure filename
-figout = os.path.splitext(file)[0] + '_svc_bigram_heatmap_thld_{}'.format(thld) + ext3
+figout = os.path.splitext(file)[0] + '_{}_bigram_heatmap_thld_{}'.format(deprel,thld) + ext3
 
 # store words appearing as the head (and dependent) more than thld times
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
@@ -149,7 +151,7 @@ for i,row in enumerate(data):
 # config layout
 plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
 fig, ax = plt.subplots()
-titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
+titl = '\'{}\' in Naija ({} over {} sentences, {} relations'.format(deprel,cnt_sent,cnt_sent_tot,cnt_bigram)
 if thld: titl += ', cnt > {})'.format(thld)
 else:    titl += ')'
 plt.title(titl)
