@@ -162,7 +162,7 @@ while True:
                   plt.xlabel('Dependant')
                   titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
                   if thld:
-                        titl += ', cnt > {} )'.format(thld)
+                        titl += ', cnt > {})'.format(thld)
                   else:
                         titl += ')'
 
