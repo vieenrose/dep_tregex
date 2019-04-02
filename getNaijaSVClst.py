@@ -178,12 +178,14 @@ data,v1,v2= reorder_matrix(data, v1, v2)
 max_cnt_deleted = 0
 if vis_data_size > 0:
 	while data.shape[0] * data.shape[1] > vis_data_size :
-	        if data.shape[0] > data.shape[1]:
-                    data = np.delete(data, -1, 0)
+	        if data.shape[1] < data.shape[0]:
 		    M = data[:,-1].max()
+                    data = np.delete(data, -1, 0)
+                    v1=v1[:-1]
                 else:
-                    data = np.delete(data, -1, 1)
 		    M = data[-1,:].max()
+                    data = np.delete(data, -1, 1)
+                    v2=v2[:-1]
 		if M > max_cnt_deleted: max_cnt_deleted = M
                 data,v1,v2= reorder_matrix(data, v1, v2)
 #debug
