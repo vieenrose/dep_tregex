@@ -4,7 +4,15 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
 
-file='all_naija.conll10'
+# command-line interface
+import argparse
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--file", "-f", type=str, required=True)
+args = parser.parse_args()
+
+
+file=args.file
 ext='.conll10'
 ext2='.txt'
 fileout=os.path.splitext(file)[0]+'_svc_list'+ext
