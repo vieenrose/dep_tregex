@@ -31,11 +31,14 @@ class sentence:
 		self.reset()
 	def add_rel(self, tid, hid):
 		inter = -1
-		new_rel = set((tid,hid))
+		new_rel = [hid,tid]
 		for i,rel in enumerate(self.rels):
-			if rel & new_rel: inter = i; break
+			if int(rel[-1]) == int(new_rel[0]): inter = i; break # when the head of new relation match the token of a existing one
 		if inter < 0: self.rels.append(new_rel) # rel doublet
-		else: self.rels[inter]=self.rels[inter].union(new_rel) # rel n-tuple, n > 2
+		else:
+			tmp = self.rels[inter]
+			tmp.append(new_rel[-1])
+			self.rels[inter] = tmp # rel n-tuple, n > 2
 	def reset(self):
 		self.id = ''
 		self.rels = []
