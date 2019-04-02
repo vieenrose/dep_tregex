@@ -137,7 +137,7 @@ with sns.axes_style("white"):
 	fig.canvas.set_window_title('Serial verb construction relation in Naija')
         plt.ylabel('Head')
         plt.xlabel('Dependant')
-	plt.title(''compound:svc' relation in Naija')
+	plt.title('\'compound:svc\' relation in Naija')
 	fig.subplots_adjust(bottom=0.15)
 plt.show()
 
