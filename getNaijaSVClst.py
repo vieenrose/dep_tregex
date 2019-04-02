@@ -98,7 +98,7 @@ for x in v1:v2 += statistics[x].keys();
 v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>1])
 
 data = []
-for x in v1: data.append([np.log(max((int(statistics[x][y])),1)) for y in v2])
+for x in v1: data.append([np.log10(max((int(statistics[x][y])),1)) for y in v2])
 print(data)
 data = np.array(data)
 mask = np.zeros_like(data)
@@ -107,7 +107,7 @@ datamin=(min([min(line)for line in data]))
 print(len(data))
 with sns.axes_style("white"):
 	fig, ax = plt.subplots()
-	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="Greens", cbar=False)
+	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, linecolor='black')
 	# We want to show all ticks...
 	ax.set_xticks(np.arange(len(v2)))
 	ax.set_yticks(np.arange(len(v1)))
