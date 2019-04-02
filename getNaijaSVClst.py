@@ -46,6 +46,7 @@ class sentence:
 
 cnt_sent = 0
 cnt_svc = 0
+cnt_svc_len = collections.Counter()
 with codecs.open(file, encoding='utf-8') as text :
         out = codecs.open(fileout,'w',encoding='utf-8')
 	sent = sentence()
@@ -80,7 +81,7 @@ with codecs.open(file, encoding='utf-8') as text :
 				out.write('# sent_id = {}\n'.format(sent_id))
 				for svc in sent.svcs:
 					# count a svc
-					cnt_svc+=1
+					cnt_svc+=1;cnt_svc_len[len(svc)] += 1
 					svc_lst = sorted(list(svc))
 					for j in svc_lst:
 						token = sent.token(j)
@@ -114,10 +115,11 @@ for x in sorted(statistics.keys()):
 # show sentence and svc counts
 print('cnt_sent',cnt_sent)
 print('cnt_svc',cnt_svc)
+print('cnt°svc_len',cnt_svc_len)
 
 # show and save heatmap
-thld = 0
-figwid = 25
+thld = 1
+figwid = 10
 
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
 v2=[]
@@ -135,20 +137,17 @@ with sns.axes_style("white"):
 	plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
 	fig, ax = plt.subplots()
 	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, square=True)
-	# We want to show all ticks...
-	ax.set_xticks(np.arange(len(v2)))
-	ax.set_yticks(np.arange(len(v1)))
 	# ... and label them with the respective list entries
 	ax.set_xticklabels(v2)
 	ax.set_yticklabels(v1)
 	# Rotate the tick labels and set their alignment.
 	plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-	plt.setp(ax.get_yticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+	plt.setp(ax.get_yticklabels(), rotation=0, ha="right", rotation_mode="default")
 	fig.canvas.set_window_title('Serial verb construction relation in Naija')
         plt.ylabel('Head')
         plt.xlabel('Dependant')
 	plt.title('\'compound:svc\' relation in Naija')
 	#fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
-plt.show()
+#plt.show()
 fig.savefig(figout)   # save the figure to file
 plt.close(fig)    # close the figure
