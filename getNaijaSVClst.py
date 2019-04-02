@@ -124,7 +124,7 @@ print('cnt_bigram',cnt_bigram)
 print('cnt_svc_len',cnt_svc_len)
 
 # show and save heatmap
-thld = 0
+thld = 1
 figwid = 15
 
 v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
@@ -159,7 +159,7 @@ with sns.axes_style("white"):
         plt.xlabel('Dependant')
 	titl = '\'compound:svc\' in Naija ({} over {} sentences, {} SVC relations'.format(cnt_sent,cnt_sent_tot,cnt_bigram)
 	if thld:
-		titl += ' cnt > {} )'.format(thld)
+		titl += ', cnt > {} )'.format(thld)
 	else:
 		titl += ')'
 
