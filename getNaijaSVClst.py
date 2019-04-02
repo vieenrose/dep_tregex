@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 
 deprel=args.deprel
-pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
+pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}[^\t]*\t.*\n'.format(deprel)
 file=args.file
 ext='.conll10'
 ext2='.txt'
@@ -90,19 +90,24 @@ with codecs.open(file, encoding='utf-8') as text :
 					rel_lst = sorted(list(rel))
 					for j in rel_lst:
 						token = sent.token(j)
-						out.write(token+'\n')
+						if token:
+   	              					out.write(token+'\n')
 					# bi-grams
-					for i in range(len(rel_lst)-1):
-						xform, xlem = sent.token(rel_lst[i]).split('\t')[1:3]
-						yform, ylem = sent.token(rel_lst[i+1]).split('\t')[1:3]
-						if xlem == '_': xlem = xform
-						if ylem == '_': ylem = yform
-						#print(xlem,ylem)
-						# bigram count
-						cnt_bigram += 1
-						if xlem not in statistics.keys():
-							statistics[xlem]=collections.Counter()
-						statistics[xlem][ylem]+=1
+					if len(rel_lst):
+						for i in range(len(rel_lst)-1):
+							try:
+								xform, xlem = sent.token(rel_lst[i]).split('\t')[1:3]
+								yform, ylem = sent.token(rel_lst[i+1]).split('\t')[1:3]
+								if xlem == '_': xlem = xform
+								if ylem == '_': ylem = yform
+								#print(xlem,ylem)
+								# bigram count
+								cnt_bigram += 1
+								if xlem not in statistics.keys():
+									statistics[xlem]=collections.Counter()
+								statistics[xlem][ylem]+=1
+							except:
+								continue
 
 				out.write('\n')
 
