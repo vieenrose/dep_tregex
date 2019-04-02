@@ -31,13 +31,14 @@ class sentence:
 		self.reset()
 	def add_rel(self, tid, hid):
 		inter = -1
-		new_rel = [hid,tid]
+		tid, hid = int(tid), int(hid)
 		for i,rel in enumerate(self.rels):
-			if int(rel[-1]) == int(new_rel[0]): inter = i; break # when the head of new relation match the token of a existing one
-		if inter < 0: self.rels.append(new_rel) # rel doublet
+			if int(rel[-1]) == hid: inter = i; break # when the head of new relation match the token of a existing one
+		if inter < 0: self.rels.append([hid,tid]) # rel doublet
 		else:
+			#pass
 			tmp = self.rels[inter]
-			tmp.append(new_rel[-1])
+			tmp.append(tid)
 			self.rels[inter] = tmp # rel n-tuple, n > 2
 	def reset(self):
 		self.id = ''
@@ -89,9 +90,10 @@ with codecs.open(file, encoding='utf-8') as text :
 				out.write(u'# sent_id = {}\n'.format(sent_id))
 				for rel in sent.rels:
 					# count a rel
-					cnt_rel+=1;cnt_rel_len[len(rel)] += 1
-					rel_lst = sorted(list(rel))
-					for j in rel_lst:
+					cnt_rel+=1
+					cnt_rel_len[len(rel)] += 1
+					rel_lst = list(rel)
+					for j in rel_lst: # [a,b,c] signify that a -dominate--> b -dominate--> c
 						token = sent.token(j)
 						if token:
    	              					out.write(token+u'\n')
@@ -174,7 +176,7 @@ cmap="Blues", cbar=False, \
 square=False, annot=True, fmt='d',\
 mask=mask, \
 linecolor='gray', linewidth=0.005)
-plt.ylabel('Dependent'); plt.xlabel('Head')
+plt.ylabel('Head'); plt.xlabel('Dependent')
 fig.canvas.set_window_title('Serial verb construction relation in Naija')
 plt.tight_layout()
 fig.savefig(figout)   # save the figure to file
