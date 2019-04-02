@@ -10,10 +10,11 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--file", "-f", type=str, required=True)
 parser.add_argument("--thld", "-t", type=int, required=False)
+parser.add_argument("--deprel", "-d", type=str, required=True)
 args = parser.parse_args()
 
 
-deprel=u'comp:pred'
+deprel=args.deprel
 pattern=u'[^\t0-9]*([0-9]+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([0-9]+)\t{}\t.*\n'.format(deprel)
 file=args.file
 ext='.conll10'
