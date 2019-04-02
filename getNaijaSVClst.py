@@ -15,10 +15,13 @@ args = parser.parse_args()
 file=args.file
 ext='.conll10'
 ext2='.txt'
+ext3='.png'
 fileout=os.path.splitext(file)[0]+'_svc_list'+ext
 fileout2=os.path.splitext(file)[0]+'_svc_bigram'+ext2
+figout=os.path.splitext(file)[0]+'_svc_bigram_heatmap'+ext3
 print('{} -> {}'.format(file,fileout))
 print('{} -> {}'.format(file,fileout2))
+print('{} -> {}'.format(file,figout))
 
 class sentence:
 	def __init__(self):
@@ -97,6 +100,7 @@ with codecs.open(file, encoding='utf-8') as text :
 
 			sent.reset()
 
+# export the list
 out2 = codecs.open(fileout2,'w',encoding='utf-8')
 for x in sorted(statistics.keys()):
 	out2.write('{:s}: '.format(x))
@@ -107,24 +111,30 @@ for x in sorted(statistics.keys()):
 		if i<len(statistics[x])-1: out2.write(', ')
 	out2.write('\n')
 
-# counts
+# show sentence and svc counts
 print('cnt_sent',cnt_sent)
 print('cnt_svc',cnt_svc)
 
-v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>1])
+# show and save heatmap
+thld = 0
+figwid = 25
+
+v1=sorted([k for k in statistics.keys() if max(statistics[k].values())>thld])
 v2=[]
 for x in v1:v2 += statistics[x].keys();
-v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>1])
+v2=sorted([i[0] for i in collections.Counter(v2).items() if i[1]>thld])
 
 data = []
-for x in v1: data.append([np.log10(max((int(statistics[x][y])),1)) for y in v2])
+for x in v1: data.append([np.log10(max((int(statistics[x][y])),max(thld,1))) for y in v2])
 data = np.array(data)
 mask = np.zeros_like(data)
 datamax=(max([max(line)for line in data]))
 datamin=(min([min(line)for line in data]))
 with sns.axes_style("white"):
+	#print(len(v1),len(v2))
+	plt.rcParams["figure.figsize"] = [len(v2)/float(len(v1))*figwid, figwid]
 	fig, ax = plt.subplots()
-	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, linecolor='black')
+	ax = sns.heatmap(data, linewidth=0.5, vmax=datamax, vmin=datamin, cmap="OrRd", cbar=False, square=True)
 	# We want to show all ticks...
 	ax.set_xticks(np.arange(len(v2)))
 	ax.set_yticks(np.arange(len(v1)))
@@ -138,6 +148,7 @@ with sns.axes_style("white"):
         plt.ylabel('Head')
         plt.xlabel('Dependant')
 	plt.title('\'compound:svc\' relation in Naija')
-	fig.subplots_adjust(bottom=0.15)
+	#fig.subplots_adjust(bottom=0.2, left=0.2, top=0.95)
 plt.show()
-
+fig.savefig(figout)   # save the figure to file
+plt.close(fig)    # close the figure
