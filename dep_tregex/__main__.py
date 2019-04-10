@@ -141,12 +141,18 @@ def _grep_text(patterns, neg_patterns = None):
     patternObjs = []
     for pat in patterns:
       patternObjs.append(parse_pattern(pat))
-
+      
+    negPatternObjs = []
+    if neg_patterns :
+      for pat in neg_patterns:
+            negPatternObjs.append(parse_pattern(pat))
+          
     for tree in read_trees_conll(sys.stdin):
         # Match.
         match = False
         for node in range(1, len(tree) + 1):
-            if all([patObj.match(tree, node, {}) for patObj in patternObjs]):
+            if all([patObj.match(tree, node, {}) for patObj in patternObjs]) and \
+               not(any([patObj.match(tree, node, {}) for patObj in negPatternObjs]) == True):
                 match = True
                 break
 
@@ -168,11 +174,17 @@ def _grep_html(patterns, limit, fields, file, neg_patterns = None):
     # Parse pattern(s).
     if isinstance(patterns, basestring): 
           patterns = [patterns]
+          
     patternObjs = []
     for pat in patterns:
       patternObjs.append(parse_pattern(pat))      
     write_prologue_html(file)
     printed = 0
+    
+    negPatternObjs = []
+    if neg_patterns:
+        for pat in neg_patterns:
+           negPatternObjs.append(parse_pattern(pat))
 
     for tree in read_trees_conll(sys.stdin):
         # Respect the limits.
@@ -187,7 +199,8 @@ def _grep_html(patterns, limit, fields, file, neg_patterns = None):
         # Match.
         matches = []
         for node in range(1, len(tree) + 1):
-            if all([patObj.match(tree, node, {}) for patObj in patternObjs]):
+            if all([patObj.match(tree, node, {}) for patObj in patternObjs]) and\
+            not(any([patObj.match(tree, node, {}) for patObj in negPatternObjs]) == True):
                 matches.append(node)
 
         # Draw.
@@ -487,8 +500,13 @@ if __name__ == '__main__':
     shuf_p = subparsers.add_parser('shuf', help='shuffle trees')
 
     # Grep.
-    grep_p = subparsers.add_parser('grep', help='filter trees by pattern')
-    grep_p.add_argument('PATTERN', help='dep-tregex pattern')
+    grep_p = subparsers.add_parser('grep', help='filter trees by pattern(s)')
+    grep_p.add_argument('PATTERN', help='dep-tregex pattern(s)')
+    grep_p.add_argument("-np", "--neg_pattern", help='dep-tregex negative pattern(s)', type=str)
+    """
+    parser.add_argument("-v", "--verbosity", type=int,
+                    help="increase output verbosity")
+    """
     grep_p.add_argument('--html', help='view matches in browser',
                         action='store_true')
     _add_html_arguments(grep_p)
@@ -551,7 +569,11 @@ if __name__ == '__main__':
         fields = _fields_from_args(args)
         new = not args.reuse_tab
         pattern_list = [x for x in args.PATTERN.split(sep_pats) if x]
-        grep(pattern_list, args.html, args.limit, fields, not args.print, new)
+        if args.neg_pattern: # negative pattern(s)
+            neg_pattern_list = [x for x in args.neg_pattern.split(sep_pats) if x]
+        else:
+            neg_pattern_list = None
+        grep(pattern_list, args.html, args.limit, fields, not args.print, new, neg_patterns=neg_pattern_list)
 
     elif args.cmd == 'sed':
         sed(args.FILE)
