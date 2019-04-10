@@ -127,18 +127,23 @@ def html(limit, fields, view, new):
 
 # - Grep  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def _grep_text(pattern):
+def _grep_text(patterns):
     """
     Read trees from stdin and print those who match the pattern.
     """
-    # Parse pattern.
-    pattern = parse_pattern(pattern)
+    # Parse pattern(s).
+    if isinstance(patterns, basestring): 
+          patterns = [patterns]
+
+    patternObjs = []
+    for pat in patterns:
+      patternObjs.append(parse_pattern(pat))
 
     for tree in read_trees_conll(sys.stdin):
         # Match.
         match = False
         for node in range(1, len(tree) + 1):
-            if pattern.match(tree, node, {}):
+            if all([patObj.match(tree, node, {}) for patObj in patternObjs]):
                 match = True
                 break
 
@@ -146,7 +151,7 @@ def _grep_text(pattern):
         if match:
             write_tree_conll(sys.stdout, tree)
 
-def _grep_html(pattern, limit, fields, file):
+def _grep_html(patterns, limit, fields, file):
     """
     Read trees from stdin, and print those who match the pattern as HTML,
     matched nodes highlighted.
@@ -156,8 +161,13 @@ def _grep_html(pattern, limit, fields, file):
     fields: CoNLL fields to print in trees
     file: file to write HTML to
     """
-    # Parse pattern.
-    pattern = parse_pattern(pattern)
+    
+    # Parse pattern(s).
+    if isinstance(patterns, basestring): 
+          patterns = [patterns]
+    patternObjs = []
+    for pat in patterns:
+      patternObjs.append(parse_pattern(pat))      
     write_prologue_html(file)
     printed = 0
 
@@ -174,7 +184,7 @@ def _grep_html(pattern, limit, fields, file):
         # Match.
         matches = []
         for node in range(1, len(tree) + 1):
-            if pattern.match(tree, node, {}):
+            if all([patObj.match(tree, node, {}) for patObj in patternObjs]):
                 matches.append(node)
 
         # Draw.
@@ -185,19 +195,19 @@ def _grep_html(pattern, limit, fields, file):
 
     write_epilogue_html(file)
 
-def grep(pattern, html, limit, fields, view, new):
+def grep(patterns, html, limit, fields, view, new):
     """
-    Read trees from stdin and print those who match the pattern.
+    Read trees from stdin and print those who match the pattern(s).
     If 'html' is False, print CoNLL trees.
     If 'html' is True and 'view' is False, print HTML to stdout.
     If 'html' is True and 'view' is True, view HTML in browser.
     """
     if not html:
-        _grep_text(pattern)
+        _grep_text(patterns)
         return
 
     if not view:
-        _grep_html(pattern, limit, fields, file=sys.stdout)
+        _grep_html(patterns, limit, fields, file=sys.stdout)
         return
 
      # Create temporary file.
@@ -207,7 +217,7 @@ def grep(pattern, html, limit, fields, view, new):
 
     # Write HTML to temporary file.
     with codecs.open(filename, 'wb', encoding='utf-8') as f:
-        _grep_html(pattern, limit, fields, file=f)
+        _grep_html(patterns, limit, fields, file=f)
 
     # Open that file.
     webbrowser.open('file://' + filename, new=new*2)
