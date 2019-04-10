@@ -130,7 +130,7 @@ def html(limit, fields, view, new):
 
 # - Grep  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def _grep_text(patterns):
+def _grep_text(patterns, neg_patterns = None):
     """
     Read trees from stdin and print those who match the pattern.
     """
@@ -154,7 +154,7 @@ def _grep_text(patterns):
         if match:
             write_tree_conll(sys.stdout, tree)
 
-def _grep_html(patterns, limit, fields, file):
+def _grep_html(patterns, limit, fields, file, neg_patterns = None):
     """
     Read trees from stdin, and print those who match the pattern as HTML,
     matched nodes highlighted.
@@ -198,7 +198,7 @@ def _grep_html(patterns, limit, fields, file):
 
     write_epilogue_html(file)
 
-def grep(patterns, html, limit, fields, view, new):
+def grep(patterns, html, limit, fields, view, new, neg_patterns = None):
     """
     Read trees from stdin and print those who match the pattern(s).
     If 'html' is False, print CoNLL trees.
@@ -206,11 +206,11 @@ def grep(patterns, html, limit, fields, view, new):
     If 'html' is True and 'view' is True, view HTML in browser.
     """
     if not html:
-        _grep_text(patterns)
+        _grep_text(patterns, neg_patterns=neg_patterns)
         return
 
     if not view:
-        _grep_html(patterns, limit, fields, file=sys.stdout)
+        _grep_html(patterns, limit, fields, file=sys.stdout, neg_patterns=neg_patterns)
         return
 
      # Create temporary file.
@@ -220,7 +220,7 @@ def grep(patterns, html, limit, fields, view, new):
 
     # Write HTML to temporary file.
     with codecs.open(filename, 'wb', encoding='utf-8') as f:
-        _grep_html(patterns, limit, fields, file=f)
+        _grep_html(patterns, limit, fields, file=f, neg_patterns=neg_patterns)
 
     # Open that file.
     webbrowser.open('file://' + filename, new=new*2)
@@ -550,7 +550,8 @@ if __name__ == '__main__':
     elif args.cmd == 'grep':
         fields = _fields_from_args(args)
         new = not args.reuse_tab
-        grep(args.PATTERN.split(sep_pats), args.html, args.limit, fields, not args.print, new)
+        pattern_list = [x for x in args.PATTERN.split(sep_pats) if x]
+        grep(pattern_list, args.html, args.limit, fields, not args.print, new)
 
     elif args.cmd == 'sed':
         sed(args.FILE)
