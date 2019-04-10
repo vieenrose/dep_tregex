@@ -26,13 +26,13 @@ DISLOCATED='d deprel /dislocated/'
 
 # covert cleft: na PIDGIN we don grow wit
 c="$FOCALIZED and .--> ($COPULA and -->. $REST)"
-# overt cleft: na PIDGIN wey we don grow wit
+# overt cleft: na PIDGIN wey we don grow wit (tofix : confusion between identificational and attributive constructions )
 o="$FOCALIZED and -->. $RELATIVE"
 # double cleft: na PIDGIN na im we don grow wit
 d="$FOCALIZED and .--> ($COPULA and -->. ($COPULA2 and -->. $FOCALIZED2))"
-# pseudo-cleft: wetin we don grow wit na Pidgin
+# pseudo-cleft: wetin we don grow wit na Pidgin (tofix : idem)
 p="$FOCALIZED and .--> ($COPULA and .<-- $DISLOCATED and form /wetin/)"
-# revserse pseudo-cleft: Pidgin na wetin we don grow wit
+# revserse pseudo-cleft: Pidgin na wetin we don grow wit (tofix : idem)
 r="$FOCALIZED and form /wetin/ and .--> ($COPULA and .<-- $DISLOCATED)"
 
 # error when no filename
