@@ -13,6 +13,9 @@ from dep_tregex.conll import *
 from dep_tregex.tree_script import *
 from dep_tregex.tree_to_html import *
 
+# seperator of patterns
+sep_pats = ';'
+
 ## ----------------------------------------------------------------------------
 #                                  Actions
 
@@ -547,7 +550,7 @@ if __name__ == '__main__':
     elif args.cmd == 'grep':
         fields = _fields_from_args(args)
         new = not args.reuse_tab
-        grep(args.PATTERN, args.html, args.limit, fields, not args.print, new)
+        grep(args.PATTERN.split(sep_pats), args.html, args.limit, fields, not args.print, new)
 
     elif args.cmd == 'sed':
         sed(args.FILE)
