@@ -81,7 +81,7 @@ def shuf():
 
 # - HTML  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-_HL_LIMIT = 100
+_HL_LIMIT = 100000
 _HL_LIMIT_MSG = 'Too many trees; #%i and on will not be highlighted on hover.'
 _LIMIT_MSG = 'Printing only %i trees; override with --limit'
 
