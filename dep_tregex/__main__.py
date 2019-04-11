@@ -449,7 +449,7 @@ if __name__ == '__main__':
     def _add_html_arguments(p, limit=True):
         if limit:
             p.add_argument('--limit', help='draw only first N trees', type=int,
-                           metavar='N', default=10)
+                           metavar='N', default=_HL_LIMIT)
         p.add_argument('--lemma', help='include LEMMA field',                       action='store_true')
         p.add_argument('--cpostag', help='include CPOSTAG field',
                        action='store_true')
